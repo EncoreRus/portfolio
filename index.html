@@ -211,23 +211,11 @@ canvas{flex-shrink:0;}
 
 <!-- NEWS -->
 <div class="panel" id="panel-news">
-
-  <!-- Панель обновления сводки -->
-  <div id="updatePanel" style="background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:16px;">
-    <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">↻ Обновить сводку</div>
-    <textarea id="jsonInput" placeholder='Вставь JSON от Claude сюда...' style="width:100%;height:120px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:IBM Plex Mono,monospace;font-size:10px;padding:10px;resize:vertical;outline:none;"></textarea>
-    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-      <button onclick="pushSvodka()" style="background:var(--accent);border:none;color:#000;font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:600;letter-spacing:1px;padding:8px 16px;border-radius:8px;cursor:pointer;">Отправить</button>
-      <div id="pushStatus" style="font-size:10px;color:var(--muted)"></div>
-    </div>
-  </div>
-
   <div class="news-wrap">
     <div class="news-date" id="newsDate"></div>
     <div id="newsList"></div>
   </div>
 </div>
-
 <!-- ALLOC -->
 <div class="panel" id="panel-alloc">
   <div class="alloc-wrap" style="margin-bottom:16px">
@@ -249,37 +237,14 @@ canvas{flex-shrink:0;}
 </div>
 <script>
 // ============================================================
-// СВОДКА — тянется из JSONbin при каждом открытии
+// СВОДКА — тянется с GitHub при каждом открытии
 // ============================================================
-const PIPEDREAM_URL = 'https://eozdpjhst1nb6wi.m.pipedream.net';
-
-async function pushSvodka() {
-  const raw = document.getElementById('jsonInput').value.trim();
-  const status = document.getElementById('pushStatus');
-  if (!raw) { status.textContent = '⚠ Вставь JSON'; status.style.color='var(--yellow)'; return; }
-  let json;
-  try { json = JSON.parse(raw); } catch(e) { status.textContent = '⚠ Невалидный JSON'; status.style.color='var(--red)'; return; }
-  status.textContent = 'Отправляем...'; status.style.color='var(--muted)';
-  try {
-    await fetch(PIPEDREAM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(json)
-    });
-    status.textContent = '✓ Сводка обновлена!'; status.style.color='var(--green)';
-    document.getElementById('jsonInput').value = '';
-    setTimeout(renderNews, 1000);
-  } catch(e) {
-    status.textContent = '✗ Ошибка отправки'; status.style.color='var(--red)';
-  }
-}
-
-const BIN_ID = '69d04025aaba882197c17ed5';
-
+const GITHUB_URL = 'https://raw.githubusercontent.com/EncoreRus/portfolio/main/svodka.json';
+let allSvodki = [];
+let currentSvodkaIndex = 0;
 
 async function renderNews() {
   const sentColor = { pos:'var(--green)', neg:'var(--red)', neut:'var(--yellow)' };
-  const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
   const list = document.getElementById('newsList');
   const dateEl = document.getElementById('newsDate');
 
@@ -287,33 +252,44 @@ async function renderNews() {
   list.innerHTML = '';
 
   try {
-    const res = await fetch(BIN_URL, {
-      headers: {
-        'X-JSON-Bin-Meta': 'false',
-        'X-Access-Key': '$2a$10$HMYaax3YGMniqy3GMljvmuXziRRxsGRvAw0XkOjgvpWCylcNkFGra'
-      }
-    });
-    const raw = await res.json();
-    // JSONbin может вернуть {record: {...}} или напрямую данные
-    const data = raw.record || raw;
-
-    dateEl.textContent = 'Сводка · ' + (data.date || '—');
-
-    const banner = data.nextEvent
-      ? `<div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--accent);margin-bottom:14px;letter-spacing:1px">${data.nextEvent}</div>`
-      : '';
-
-    const items = (data.items || []).map(n => `
-      <div class="nitem">
-        <span class="ndot" style="color:${sentColor[n.sentiment] || sentColor.neut}">●</span>
-        <div class="ntext"><b>${n.ticker}</b> — ${n.text}</div>
-      </div>`).join('');
-
-    list.innerHTML = banner + items;
+    const res = await fetch(GITHUB_URL + '?t=' + Date.now());
+    allSvodki = await res.json();
+    renderSvodka(0);
   } catch(e) {
     dateEl.textContent = 'Нет связи — сводка недоступна';
-    list.innerHTML = '<div class="nitem"><span class="ndot neut">●</span><div class="ntext">Проверь подключение к интернету</div></div>';
+    list.innerHTML = '<div class="nitem"><span class="ndot" style="color:var(--muted)">●</span><div class="ntext">Проверь подключение к интернету</div></div>';
   }
+}
+
+function renderSvodka(index) {
+  const sentColor = { pos:'var(--green)', neg:'var(--red)', neut:'var(--yellow)' };
+  const list = document.getElementById('newsList');
+  const dateEl = document.getElementById('newsDate');
+  if (!allSvodki.length) return;
+  currentSvodkaIndex = index;
+  const data = allSvodki[index];
+
+  // Навигация по архиву
+  const nav = allSvodki.length > 1 ? `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <button onclick="renderSvodka(${index-1})" ${index===0?'disabled':''} style="background:var(--s2);border:1px solid var(--border);color:${index===0?'var(--muted)':'var(--text)'};font-family:IBM Plex Mono,monospace;font-size:10px;padding:4px 10px;border-radius:6px;cursor:${index===0?'default':'pointer'}">← новее</button>
+      <span style="font-size:9px;color:var(--muted)">${index+1} из ${allSvodki.length}</span>
+      <button onclick="renderSvodka(${index+1})" ${index===allSvodki.length-1?'disabled':''} style="background:var(--s2);border:1px solid var(--border);color:${index===allSvodki.length-1?'var(--muted)':'var(--text)'};font-family:IBM Plex Mono,monospace;font-size:10px;padding:4px 10px;border-radius:6px;cursor:${index===allSvodki.length-1?'default':'pointer'}">старее →</button>
+    </div>` : '';
+
+  dateEl.textContent = 'Сводка · ' + (data.date || '—');
+
+  const banner = data.nextEvent
+    ? `<div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--accent);margin-bottom:14px;letter-spacing:1px">${data.nextEvent}</div>`
+    : '';
+
+  const items = (data.items || []).map(n => `
+    <div class="nitem">
+      <span class="ndot" style="color:${sentColor[n.sentiment] || sentColor.neut}">●</span>
+      <div class="ntext"><b>${n.ticker}</b> — ${n.text}</div>
+    </div>`).join('');
+
+  list.innerHTML = nav + banner + items;
 }
 
 const S=[
