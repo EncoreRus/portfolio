@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Benjamin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07080d;--s1:#0e0f18;--s2:#161824;--border:#1e2035;--border2:#2a2d4a;
+  --accent:#00d4ff;--green:#00e676;--red:#ff4757;--yellow:#ffd32a;--purple:#7c6aff;
+  --text:#dde1f0;--muted:#555878;--muted2:#888baa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 60px;}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;}
+.hdr h1{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-sub{font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+.hdr-right{text-align:right;}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,230,118,0.3);padding:5px 10px;border-radius:100px;background:rgba(0,230,118,0.05);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.upd{font-size:9px;color:var(--muted);margin-top:6px;}
+.refresh-btn{background:transparent;border:1px solid var(--border2);color:var(--muted2);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all 0.2s;margin-top:6px;}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.scard{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.scard::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);}
+.scard-lbl{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.scard-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;}
+.scard-sub{font-size:10px;margin-top:4px;}
+.pos{color:var(--green)}.neg{color:var(--red)}.neut{color:var(--muted2)}
+.sec{font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin:28px 0 12px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.alloc-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:4px;}
+.arow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}.arow:last-child{margin-bottom:0;}
+.an{font-size:10px;color:var(--muted2);width:80px;flex-shrink:0;}
+.bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bf{height:100%;border-radius:3px;}
+.ap{font-size:10px;font-weight:600;width:44px;text-align:right;flex-shrink:0;}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.tab{background:var(--s1);border:1px solid var(--border);color:var(--muted2);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border-radius:100px;cursor:pointer;transition:all 0.2s;}
+.tab.active,.tab:hover{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600;}
+.slist{display:flex;flex-direction:column;gap:6px;}
+.srow{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:13px 15px;cursor:pointer;transition:all 0.2s;}
+.srow:hover{border-color:var(--border2);background:var(--s2);}
+.srow.open{border-color:var(--accent);}
+.srow-main{display:flex;align-items:center;gap:12px;}
+.ticker{font-size:10px;font-weight:600;letter-spacing:1px;background:var(--s2);border:1px solid var(--border2);padding:4px 8px;border-radius:6px;min-width:50px;text-align:center;flex-shrink:0;}
+.si{flex:1;min-width:0;}
+.sname{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sqty{font-size:10px;color:var(--muted);margin-top:2px;}
+.lprice{font-size:9px;color:var(--accent);margin-top:2px;}
+.lprice.loading{animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.sr{text-align:right;flex-shrink:0;}
+.sval{font-family:'Bebas Neue',sans-serif;font-size:18px;}
+.schg{font-size:10px;margin-top:2px;}
+.spct{font-size:9px;color:var(--muted);margin-top:2px;}
+.pill{display:inline-block;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border-radius:100px;font-weight:600;margin-bottom:10px;}
+.p-hold{background:rgba(124,106,255,.12);color:var(--purple);border:1px solid rgba(124,106,255,.25);}
+.p-buy{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.25);}
+.p-watch{background:rgba(255,211,42,.1);color:var(--yellow);border:1px solid rgba(255,211,42,.25);}
+.p-caution{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.25);}
+.detail{display:none;margin-top:13px;padding-top:13px;border-top:1px solid var(--border);}
+.srow.open .detail{display:block;}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.dl{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+.dv{font-size:12px;}
+.thesis{font-size:11px;color:var(--muted2);line-height:1.7;}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wcard{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:10px;padding:14px;}
+.wcard.hot{border-left-color:var(--green);}
+.wt{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:1px;margin-bottom:3px;}
+.wn{font-size:11px;margin-bottom:6px;}
+.wtr{font-size:10px;color:var(--yellow);margin-bottom:5px;}
+.wcard.hot .wtr{color:var(--green);}
+.wcard .wp{font-size:11px;font-weight:600;margin-bottom:3px;}
+.ww{font-size:10px;color:var(--muted2);line-height:1.5;}
+.news-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.news-date{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+.nitem{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.nitem:last-child{margin-bottom:0;}
+.ndot{font-size:11px;flex-shrink:0;margin-top:2px;}
+.ntext{font-size:11px;line-height:1.6;color:var(--muted2);}
+.ntext b{color:var(--text);}
+.api-note{background:rgba(255,211,42,.07);border:1px solid rgba(255,211,42,.2);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--yellow);margin-bottom:14px;display:none;}
+/* Main tabs */
+.main-tabs{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.main-tab{flex:1;background:var(--s1);color:var(--muted2);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 6px;cursor:pointer;transition:all .2s;border:none;text-align:center;}
+.main-tab.active{background:var(--accent);color:#000;font-weight:600;}
+.main-tab:not(:last-child){border-right:1px solid var(--border);}
+.panel{display:none;}.panel.active{display:block;}
+/* Alloc panel */
+.alloc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.donut-layout{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.donut-legend{flex:1;min-width:140px;}
+.dl-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;transition:opacity .2s;}
+.dl-item:hover{opacity:.75;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-name{font-size:10px;color:var(--muted2);flex:1;}
+.dl-pct{font-size:10px;font-weight:600;}
+canvas{flex-shrink:0;}
+@media(max-width:480px){.alloc-grid{grid-template-columns:1fr;}.wgrid{grid-template-columns:1fr;}.summary{grid-template-columns:1fr;}.donut-layout{justify-content:center;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div>
+    <h1>ПОРТФЕЛЬ</h1>
+    <div class="hdr-sub">Benjamin · Долгосрок · Мосбиржа</div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-badge"><span class="live-dot"></span>Live MOEX</div>
+    <div class="upd" id="upd">Загрузка...</div>
+    <button class="refresh-btn" onclick="loadPrices()">↻ Обновить</button>
+  </div>
+</div>
+
+<div class="api-note" id="apiNote">⚠ Биржа недоступна или выходной — показаны последние данные.</div>
+
+<div class="summary">
+  <div class="scard">
+    <div class="scard-lbl">Общий портфель</div>
+    <div class="scard-val" id="totalVal">539 199 ₽</div>
+    <div class="scard-sub neut">21 позиция + TMON</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">P&L за всё время</div>
+    <div class="scard-val pos" id="pnlVal">+6 877 ₽</div>
+    <div class="scard-sub pos" id="pnlPct">+1,29% от вложенных</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">Брокерский счёт</div>
+    <div class="scard-val neg">−3,66%</div>
+    <div class="scard-sub neut">294 576 ₽ без TMON</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">Инвесткопилка</div>
+    <div class="scard-val pos">+7,98%</div>
+    <div class="scard-sub neut">244 623 ₽ · TMON</div>
+  </div>
+</div>
+
+<!-- MAIN TABS -->
+<div class="main-tabs">
+  <div class="main-tab active" onclick="showPanel('portfolio',this)">Портфель</div>
+  <div class="main-tab" onclick="showPanel('buy',this)">Купить</div>
+  <div class="main-tab" onclick="showPanel('news',this)">Новости</div>
+  <div class="main-tab" onclick="showPanel('alloc',this)">Структура</div>
+</div>
+
+<!-- PORTFOLIO -->
+<div class="panel active" id="panel-portfolio">
+  <div class="tabs">
+    <button class="tab active" onclick="ft('all',this)">Все</button>
+    <button class="tab" onclick="ft('buy',this)">Докупать</button>
+    <button class="tab" onclick="ft('hold',this)">Держать</button>
+    <button class="tab" onclick="ft('watch',this)">Наблюдать</button>
+    <button class="tab" onclick="ft('caution',this)">Осторожно</button>
+  </div>
+  <div class="slist" id="slist"></div>
+</div>
+
+<!-- BUY -->
+<div class="panel" id="panel-buy">
+  <div class="sec">Купить на этой неделе</div>
+  <div class="wgrid">
+    <div class="wcard hot">
+      <div class="wt">OZON</div><div class="wn">МКПао Озон</div>
+      <div class="wtr">⚡ Алерт на 4 100 ₽</div>
+      <div class="wp pos" id="wp-OZON">—</div>
+      <div class="ww">Выход на прибыль 2026. Нет долга. Дивиденды объявлены.</div>
+    </div>
+    <div class="wcard hot">
+      <div class="wt">YDEX</div><div class="wn">Яндекс</div>
+      <div class="wtr">⚡ Дивиденды 110 ₽</div>
+      <div class="wp pos" id="wp-YDEX">—</div>
+      <div class="ww">Рост +30% в 2025. Снижение ставки = импульс рекламе.</div>
+    </div>
+    <div class="wcard">
+      <div class="wt">ELMT</div><div class="wn">Элемент</div>
+      <div class="wtr">↗ Выкуп 0,146 до 13 мая</div>
+      <div class="wp" id="wp-ELMT">—</div>
+      <div class="ww">Микроэлектроника + 1 трлн ₽ господержки. Только маленькая позиция.</div>
+    </div>
+    <div class="wcard">
+      <div class="wt">NVTK</div><div class="wn">НОВАТЭК</div>
+      <div class="wtr">→ На просадках 1 150–1 200 ₽</div>
+      <div class="wp" id="wp-NVTK">—</div>
+      <div class="ww">Энергетика. Сильнее Газпрома как бизнес.</div>
+    </div>
+    <div class="wcard">
+      <div class="wt">ASTR</div><div class="wn">Группа Астра</div>
+      <div class="wtr">📊 Отчёт 2 апреля — смотри первым</div>
+      <div class="wp" id="wp-ASTR">—</div>
+      <div class="ww">IT-импортозамещение. Сначала отчёт, потом решение.</div>
+    </div>
+    <div class="wcard">
+      <div class="wt">FIVE</div><div class="wn">X5 Group</div>
+      <div class="wtr">→ Балансировка портфеля</div>
+      <div class="wp" id="wp-FIVE">—</div>
+      <div class="ww">Ретейл. Фаворит 9 из 11 аналитиков. Мало потребсектора.</div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="panel" id="panel-news">
+
+  <!-- Панель обновления сводки -->
+  <div id="updatePanel" style="background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:16px;">
+    <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">↻ Обновить сводку</div>
+    <textarea id="jsonInput" placeholder='Вставь JSON от Claude сюда...' style="width:100%;height:120px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:IBM Plex Mono,monospace;font-size:10px;padding:10px;resize:vertical;outline:none;"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+      <button onclick="pushSvodka()" style="background:var(--accent);border:none;color:#000;font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:600;letter-spacing:1px;padding:8px 16px;border-radius:8px;cursor:pointer;">Отправить</button>
+      <div id="pushStatus" style="font-size:10px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <div class="news-wrap">
+    <div class="news-date" id="newsDate"></div>
+    <div id="newsList"></div>
+  </div>
+</div>
+
+<!-- ALLOC -->
+<div class="panel" id="panel-alloc">
+  <div class="alloc-wrap" style="margin-bottom:16px">
+    <div class="sec" style="margin-top:0">По компаниям</div>
+    <div class="donut-layout">
+      <canvas id="donut1" width="200" height="200"></canvas>
+      <div class="donut-legend" id="legend1"></div>
+    </div>
+  </div>
+  <div class="alloc-wrap">
+    <div class="sec" style="margin-top:0">По секторам</div>
+    <div class="donut-layout">
+      <canvas id="donut2" width="200" height="200"></canvas>
+      <div class="donut-legend" id="legend2"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+// ============================================================
+// СВОДКА — тянется из JSONbin при каждом открытии
+// ============================================================
+const PIPEDREAM_URL = 'https://eozdpjhst1nb6wi.m.pipedream.net';
+
+async function pushSvodka() {
+  const raw = document.getElementById('jsonInput').value.trim();
+  const status = document.getElementById('pushStatus');
+  if (!raw) { status.textContent = '⚠ Вставь JSON'; status.style.color='var(--yellow)'; return; }
+  let json;
+  try { json = JSON.parse(raw); } catch(e) { status.textContent = '⚠ Невалидный JSON'; status.style.color='var(--red)'; return; }
+  status.textContent = 'Отправляем...'; status.style.color='var(--muted)';
+  try {
+    await fetch(PIPEDREAM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(json)
+    });
+    status.textContent = '✓ Сводка обновлена!'; status.style.color='var(--green)';
+    document.getElementById('jsonInput').value = '';
+    setTimeout(renderNews, 1000);
+  } catch(e) {
+    status.textContent = '✗ Ошибка отправки'; status.style.color='var(--red)';
+  }
+}
+
+const BIN_ID = '69d04025aaba882197c17ed5';
+
+
+async function renderNews() {
+  const sentColor = { pos:'var(--green)', neg:'var(--red)', neut:'var(--yellow)' };
+  const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+  const list = document.getElementById('newsList');
+  const dateEl = document.getElementById('newsDate');
+
+  dateEl.textContent = 'Загружаем сводку...';
+  list.innerHTML = '';
+
+  try {
+    const res = await fetch(BIN_URL, {
+      headers: {
+        'X-JSON-Bin-Meta': 'false',
+        'X-Access-Key': '$2a$10$HMYaax3YGMniqy3GMljvmuXziRRxsGRvAw0XkOjgvpWCylcNkFGra'
+      }
+    });
+    const raw = await res.json();
+    // JSONbin может вернуть {record: {...}} или напрямую данные
+    const data = raw.record || raw;
+
+    dateEl.textContent = 'Сводка · ' + (data.date || '—');
+
+    const banner = data.nextEvent
+      ? `<div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--accent);margin-bottom:14px;letter-spacing:1px">${data.nextEvent}</div>`
+      : '';
+
+    const items = (data.items || []).map(n => `
+      <div class="nitem">
+        <span class="ndot" style="color:${sentColor[n.sentiment] || sentColor.neut}">●</span>
+        <div class="ntext"><b>${n.ticker}</b> — ${n.text}</div>
+      </div>`).join('');
+
+    list.innerHTML = banner + items;
+  } catch(e) {
+    dateEl.textContent = 'Нет связи — сводка недоступна';
+    list.innerHTML = '<div class="nitem"><span class="ndot neut">●</span><div class="ntext">Проверь подключение к интернету</div></div>';
+  }
+}
+
+const S=[
+  {t:'GAZP',n:'Газпром',q:1080,bp:127.73,v:143661,cp:4.14,pct:26.79,st:'hold',c:'#00d4ff',th:'Ставка на нормализацию геополитики. Хранилища ЕС 28,45% — исторический минимум. Европе нужен газ. Горизонт 3-5 лет.'},
+  {t:'TMON',n:'Т-Капитал (подушка)',q:1578,bp:130.88,v:244623,cp:7.98,pct:45.37,st:'hold',c:'#7c6aff',th:'Фонд денежного рынка. Доходность ~15% (ключевая ставка). Кэш-подушка, не инвестиция в рост. +7,98% за всё время. Перекрывает убыток счёта.'},
+  {t:'MRKC',n:'Россети Центр',q:24000,bp:0.6315,v:20141,cp:32.88,pct:3.75,st:'hold',c:'#00e676',th:'Лучшая позиция по доходности +32,88%. Электроэнергетика стабильна. Держать.'},
+  {t:'OZON',n:'МКПао Озон',q:4,bp:4023.1,v:17598,cp:9.35,pct:3.27,st:'buy',c:'#00e676',th:'Выходит на прибыль в 2026. Нет долга. Дивиденды объявлены. Алерт на 4 100 ₽ — докупать на просадке.'},
+  {t:'MTLR',n:'Мечел',q:217,bp:99.45,v:14181,cp:-34.28,pct:2.63,st:'watch',c:'#ffd32a',th:'Долг ~280 млрд ₽. Ставка снижается — бенефициар. Отчёт за 2025 слабый. Держать, не докупать.'},
+  {t:'GMKN',n:'Норильский никель',q:100,bp:124.45,v:13984,cp:12.36,pct:2.60,st:'hold',c:'#00d4ff',th:'Мировой лидер по никелю и палладию. +12,36% от входа. Долгосрок оправдан. Держать.'},
+  {t:'SVCB',n:'Совкомбанк',q:1000,bp:15.219,v:12645,cp:-16.91,pct:2.35,st:'watch',c:'#ffd32a',th:'Финансовый сектор. Снижение ставки — позитив. Следить.'},
+  {t:'MOEX',n:'Московская биржа',q:60,bp:194.79,v:10187,cp:-12.83,pct:1.90,st:'hold',c:'#7c6aff',th:'Зарабатывает на высоких ставках. При снижении — давление. Держать.'},
+  {t:'CHMF',n:'Северсталь',q:11,bp:1178.3,v:9266,cp:-28.50,pct:1.72,st:'watch',c:'#ffd32a',th:'Металлурги под санкциями. Северсталь сильнее НЛМК. Держать без докупки.'},
+  {t:'YDEX',n:'Яндекс',q:2,bp:4109.7,v:8473,cp:3.08,pct:1.58,st:'buy',c:'#00e676',th:'Флагман IT. +30% выручки в 2025. Дивиденды 110 ₽. Снижение ставки даст импульс рекламе. Докупать.'},
+  {t:'NLMK',n:'НЛМК',q:70,bp:140.81,v:6731,cp:-31.71,pct:1.25,st:'watch',c:'#ffd32a',th:'Прибыль +65,5% в 2025 — неожиданно хорошо. Пересмотрен: "осторожно" → "наблюдать".'},
+  {t:'ASTR',n:'Группа Астра',q:27,bp:428.97,v:6985,cp:-39.69,pct:1.30,st:'watch',c:'#ffd32a',th:'IT-импортозамещение. Отчёт за 2025 вышел — смотри результаты.'},
+  {t:'RUAL',n:'РУСАЛ',q:140,bp:35.519,v:5508,cp:10.77,pct:1.03,st:'hold',c:'#7c6aff',th:'Алюминий востребован. +10,77% от входа. Держать.'},
+  {t:'NVTK',n:'НОВАТЭК',q:4,bp:1182.3,v:5098,cp:7.80,pct:0.95,st:'buy',c:'#00e676',th:'Альтернатива Газпрому, но сильнее как бизнес. Держать и докупать.'},
+  {t:'AFLT',n:'Аэрофлот',q:100,bp:63.19,v:4759,cp:-24.68,pct:0.88,st:'caution',c:'#ff4757',th:'Зависит от госсубсидий и курса рубля. Нет чёткого катализатора.'},
+  {t:'T',n:'Т-Технологии',q:1,bp:3308,v:3225,cp:-2.50,pct:0.60,st:'hold',c:'#7c6aff',th:'Т-Банк, 52,8 млн клиентов. Сильная экосистема. Держать.'},
+  {t:'ABRD',n:'АбрауДюрсо',q:20,bp:185.7,v:3064,cp:-17.50,pct:0.57,st:'caution',c:'#ff4757',th:'Маленькая позиция без тезиса. Рассмотреть выход.'},
+  {t:'VKCO',n:'ВК',q:11,bp:337.33,v:2974,cp:-19.84,pct:0.55,st:'caution',c:'#ff4757',th:'Убыточная компания, нет пути к прибыльности. Рассмотреть выход.'},
+  {t:'HNFG',n:'Henderson',q:6,bp:573.4,v:2720,cp:-20.92,pct:0.51,st:'caution',c:'#ff4757',th:'Розница под давлением. Нет тезиса.'},
+  {t:'ABIO',n:'Артген',q:30,bp:91.23,v:1830,cp:-33.13,pct:0.34,st:'caution',c:'#ff4757',th:'Маленькая биотех. Очень спекулятивно. Не для долгосрока.'},
+  {t:'ELMT',n:'Группа Элемент',q:null,bp:0.226,v:0,cp:-36.61,pct:0,st:'watch',c:'#ffd32a',th:'Микроэлектроника РФ. Госденьги 1 трлн ₽. Выкуп 0,146 до 13 мая. Смена CEO — риск. Только маленькая ставка.'},
+];
+
+const SL={hold:'Держать',buy:'Докупать',watch:'Наблюдать',caution:'Осторожно'};
+const SC={hold:'p-hold',buy:'p-buy',watch:'p-watch',caution:'p-caution'};
+let LP={},cf='all';
+
+async function loadPrices(){
+  const tks=S.filter(s=>s.t!=='TMON').map(s=>s.t).join(',');
+  document.getElementById('upd').textContent='Обновляем...';
+  try{
+    const r=await fetch(`https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json?securities=${tks}&iss.meta=off&iss.only=marketdata&marketdata.columns=SECID,LAST,LASTTOPREVPRICE`);
+    const d=await r.json();
+    d.marketdata.data.forEach(row=>{
+      if(row[0]&&row[1]) LP[row[0]]={price:row[1],chgPct:row[2]};
+    });
+    // P&L + total
+    let pnl=0,cost=0,liveTotal=244623; // TMON base
+    S.forEach(s=>{
+      if(s.t==='TMON')return;
+      if(s.q&&s.bp&&LP[s.t]){
+        cost+=s.bp*s.q;
+        pnl+=(LP[s.t].price-s.bp)*s.q;
+        liveTotal+=LP[s.t].price*s.q;
+      } else if(s.v){
+        liveTotal+=s.v;
+      }
+    });
+    document.getElementById('totalVal').textContent=Math.round(liveTotal).toLocaleString('ru')+' ₽';
+    if(cost>0){
+      const pct=(pnl/cost*100).toFixed(1);
+      document.getElementById('pnlVal').textContent=(pnl>=0?'+':'')+Math.round(pnl).toLocaleString('ru')+' ₽';
+      document.getElementById('pnlVal').className='scard-val '+(pnl>=0?'pos':'neg');
+      document.getElementById('pnlPct').textContent=(pnl>=0?'+':'')+pct+'% от вложенных';
+      document.getElementById('pnlPct').className='scard-sub '+(pnl>=0?'pos':'neg');
+    }
+    const n=new Date();
+    document.getElementById('upd').textContent=`Обновлено ${n.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('apiNote').style.display='none';
+  }catch(e){
+    document.getElementById('upd').textContent='Нет данных (выходной?)';
+    document.getElementById('apiNote').style.display='block';
+  }
+  render(cf);
+  updateWatchPrices();
+}
+
+function render(f){
+  cf=f;
+  const fl=f==='all'?S:S.filter(s=>s.st===f);
+  document.getElementById('slist').innerHTML=fl.map((s,i)=>{
+    const lv=LP[s.t];
+    // Current price: live if available, else derive from value/qty
+    const curPrice = lv ? lv.price : (s.q && s.v ? s.v/s.q : null);
+    const curValue = lv && s.q ? lv.price*s.q : s.v;
+
+    // P&L in rubles (from buy price)
+    let plRub = null, plPct = s.cp;
+    if(s.bp && s.q && curPrice){
+      plRub = (curPrice - s.bp) * s.q;
+      plPct = ((curPrice - s.bp)/s.bp*100);
+    } else if(s.bp && s.q && s.v){
+      plRub = s.v - s.bp*s.q;
+      plPct = s.cp;
+    }
+    // TMON: fixed P&L
+    if(s.t==='TMON'){ plRub = s.v * (s.cp/100); plPct = s.cp; }
+
+    const plRubStr = plRub !== null
+      ? `<span class="${plRub>=0?'pos':'neg'}">${plRub>=0?'+':''}${Math.round(plRub).toLocaleString('ru')} ₽</span>`
+      : '';
+    const plPctStr = `<span class="${plPct>=0?'pos':'neg'}">${plPct>=0?'+':''}${typeof plPct==='number'?plPct.toFixed(2):plPct}%</span>`;
+
+    const livePriceLine = lv
+      ? `<div class="lprice">▸ ${lv.price.toLocaleString('ru',{minimumFractionDigits:2,maximumFractionDigits:4})} ₽ сейчас</div>`
+      : (s.t!=='TMON'&&s.t!=='ELMT' ? `<div class="lprice loading">загрузка цены...</div>` : '');
+
+    const todayChg = lv ? `<div class="schg ${lv.chgPct>=0?'pos':'neg'}">${lv.chgPct>=0?'+':''}${lv.chgPct.toFixed(2)}% сегодня</div>` : '';
+
+    return`<div class="srow" id="r${i}" onclick="tog(${i})">
+      <div class="srow-main">
+        <div class="ticker" style="color:${s.c}">${s.t}</div>
+        <div class="si">
+          <div class="sname">${s.n}</div>
+          <div class="sqty">${s.q?s.q.toLocaleString('ru')+' шт.'+(curPrice?' · '+curPrice.toLocaleString('ru',{maximumFractionDigits:4})+' ₽':''):s.t==='TMON'?'фонд':'вотчлист'}</div>
+          ${livePriceLine}
+        </div>
+        <div class="sr">
+          <div class="sval">${curValue?Math.round(curValue).toLocaleString('ru')+' ₽':'—'}</div>
+          <div style="font-size:10px;margin-top:2px">${plRubStr} ${plRubStr?'·':''} ${plPctStr}</div>
+          ${todayChg}
+          <div class="spct">${s.pct?s.pct+'% портфеля':''}</div>
+        </div>
+      </div>
+      <div class="detail">
+        <span class="pill ${SC[s.st]}">${SL[s.st]}</span>
+        <div class="dgrid">
+          ${s.bp?`<div><div class="dl">Цена входа</div><div class="dv">${s.bp.toLocaleString('ru',{maximumFractionDigits:4})} ₽</div></div>`:''}
+          ${curPrice?`<div><div class="dl">Цена сейчас ${lv?'🟢':''}</div><div class="dv">${curPrice.toLocaleString('ru',{maximumFractionDigits:4})} ₽</div></div>`:''}
+          <div><div class="dl">Доля</div><div class="dv">${s.pct||'—'}%</div></div>
+          ${plRub!==null?`<div><div class="dl">P&L в рублях</div><div class="dv ${plRub>=0?'pos':'neg'}">${plRub>=0?'+':''}${Math.round(plRub).toLocaleString('ru')} ₽</div></div>`:''}
+        </div>
+        <div class="thesis">${s.th}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(i){document.getElementById('r'+i)?.classList.toggle('open');}
+function ft(f,btn){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render(f);}
+function updateWatchPrices(){
+  ['OZON','YDEX','ELMT','NVTK','ASTR','FIVE'].forEach(t=>{
+    const el=document.getElementById('wp-'+t);
+    if(!el)return;
+    const lp=LP[t];
+    if(lp){
+      el.textContent=lp.price.toLocaleString('ru',{maximumFractionDigits:2})+' ₽  '+(lp.chgPct>=0?'+':'')+lp.chgPct.toFixed(2)+'% сегодня';
+      el.className='wp '+(lp.chgPct>=0?'pos':'neg');
+    }
+  });
+}
+
+// ---- DONUT CHARTS ----
+const COMPANIES = [
+  {name:'TMON',  pct:45.4, color:'#7c6aff'},
+  {name:'GAZP',  pct:26.8, color:'#00d4ff'},
+  {name:'MRKC',  pct:3.75, color:'#00e676'},
+  {name:'OZON',  pct:3.27, color:'#4ade80'},
+  {name:'MTLR',  pct:2.63, color:'#ffd32a'},
+  {name:'GMKN',  pct:2.60, color:'#60a5fa'},
+  {name:'Остальные', pct:15.55, color:'#333355'},
+];
+const SECTORS = [
+  {name:'Фонд (TMON)',  pct:45.4, color:'#7c6aff'},
+  {name:'Энергетика',   pct:27.7, color:'#00d4ff'},
+  {name:'Сырьё',        pct:9.3,  color:'#00e676'},
+  {name:'Потребитель',  pct:5.2,  color:'#ffd32a'},
+  {name:'Финансы',      pct:4.9,  color:'#ff4757'},
+  {name:'Электроэн.',   pct:3.75, color:'#4ade80'},
+  {name:'IT',           pct:3.4,  color:'#888baa'},
+];
+
+function drawDonut(canvasId, legendId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  const outerR = W/2 - 8;
+  const innerR = outerR * 0.58;
+  const total = data.reduce((s,d)=>s+d.pct,0);
+  let angle = -Math.PI/2;
+  const gap = 0.018;
+
+  ctx.clearRect(0,0,W,H);
+
+  data.forEach(d => {
+    const slice = (d.pct/total) * Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,outerR, angle+gap/2, angle+slice-gap/2);
+    ctx.arc(cx,cy,innerR, angle+slice-gap/2, angle+gap/2, true);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    angle += slice;
+  });
+
+  // Centre text
+  ctx.fillStyle = '#dde1f0';
+  ctx.font = 'bold 13px "IBM Plex Mono"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(data.length + ' позиций', cx, cy);
+
+  // Legend
+  const leg = document.getElementById(legendId);
+  if (!leg) return;
+  leg.innerHTML = data.map(d=>`
+    <div class="dl-item">
+      <div class="dl-dot" style="background:${d.color}"></div>
+      <div class="dl-name">${d.name}</div>
+      <div class="dl-pct" style="color:${d.color}">${d.pct}%</div>
+    </div>`).join('');
+}
+
+// Draw on tab open
+const origShowPanel = window.showPanel;
+function showPanel(name,btn){
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='alloc'){
+    setTimeout(()=>{
+      drawDonut('donut1','legend1',COMPANIES);
+      drawDonut('donut2','legend2',SECTORS);
+    },50);
+  }
+}
+
+render('all');
+renderNews();
+loadPrices();
+setInterval(loadPrices,60000);
+</script>
+</body>
+</html>
